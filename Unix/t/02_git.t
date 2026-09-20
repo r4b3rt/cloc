@@ -4,6 +4,9 @@ use strict;
 use Test::More;
 use File::Copy "cp";
 use Cwd;
+use Getopt::Std;
+my %opt;
+getopts('u', \%opt);  # -u to run Unix/cloc instead of ../cloc
 my @Tests = (
                 {
                     'name' => 'direct count git hash 1',
@@ -54,28 +57,29 @@ my @Tests = (
                     'cd'   => 'cloc_submodule_test',
                 },
 
+                # cannot use HEAD~1 HEAD as the diff is not deterministic
                 {
                     'name' => 'count and diff part I',
-                    'args' => '--strip-str-comments  --git --count-and-diff HEAD~1 HEAD',
+                    'args' => '--strip-str-comments  --git --count-and-diff 3b359b4904 f647093e8be',
                     'ref'  => '../tests/outputs/git_tests/count_and_diff.yaml.HEAD',
                     'cd'   => 'cloc_submodule_test',
-                    'results'  => 'results.yaml.HEAD',
+                    'results'  => 'results.yaml.f647093e8be',
                 },
 
                 {
                     'name' => 'count and diff part II',
-                    'args' => '--strip-str-comments  --git --count-and-diff HEAD~1 HEAD',
+                    'args' => '--strip-str-comments  --git --count-and-diff 3b359b4904 f647093e8be',
                     'ref'  => '../tests/outputs/git_tests/count_and_diff.yaml.HEAD~1',
                     'cd'   => 'cloc_submodule_test',
-                    'results'  => 'results.yaml.HEAD~1',
+                    'results'  => 'results.yaml.3b359b4904',
                 },
 
                 {
                     'name' => 'count and diff part III',
-                    'args' => '--strip-str-comments  --git --count-and-diff HEAD~1 HEAD',
+                    'args' => '--strip-str-comments  --git --count-and-diff 3b359b4904 f647093e8be',
                     'ref'  => '../tests/outputs/git_tests/count_and_diff.yaml.diff.HEAD~1.HEAD',
                     'cd'   => 'cloc_submodule_test',
-                    'results'  => 'results.yaml.diff.HEAD~1.HEAD',
+                    'results'  => 'results.yaml.diff.3b359b4904.f647093e8be',
                 },
 
                 {
@@ -99,22 +103,31 @@ my @Tests = (
                     'cd'   => '.',
                 },
 
+                {
+                    'name' => '--exclude-lang with --git --diff and all additions, #917',
+                    'args' => '--git --diff ../../tests/inputs/issues/917/empty.tar f647093e8b --exclude-lang=C',
+                    'ref'  => '../tests/outputs/issues/917/results.yaml',
+                    'cd'   => 'cloc_submodule_test',
+                },
+
             );
 
 my $Verbose = 0;
+my $cloc;
 
 if (!-d 'cloc_submodule_test') {
     print "-" x 79, "\n";
     print "Directory 'cloc_submodule_test' is not found; git tests skipped.\n";
     print "To enable the tests, create the directory with\n";
-    print "    git clone https://github.com/AlDanial/cloc_submodule_test.git\n";
+    print "    git submodule add -f https://github.com/AlDanial/cloc_submodule_test.git\n";
     ok( 0, "git tests");
     print "-" x 79, "\n";
 } else {
     my $results  = 'results.yaml';
     my $work_dir = getcwd;
-    my $cloc     = "$work_dir/../cloc";   # all-purpose version
-#   my $cloc     = "$work_dir/cloc";      # Unix-tuned version
+       $cloc     = "$work_dir/../cloc";                 # all-purpose version
+       $cloc     = "$work_dir/cloc" if defined $opt{u}; # Unix-tuned version
+
     my $Run = "$cloc --quiet --yaml --out $results ";
     foreach my $t (@Tests) {
         chdir($t->{'cd'}) if defined $t->{'cd'};
@@ -136,6 +149,7 @@ if (!-d 'cloc_submodule_test') {
     }
 }
 done_testing();
+print "Finished testing $cloc\n";
 
 sub load_yaml { # {{{1
     my ($file, ) = @_;

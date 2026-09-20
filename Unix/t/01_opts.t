@@ -4,7 +4,9 @@ use strict;
 use Test::More;
 use File::Copy "cp";
 use Cwd;
-#use YAML qw(LoadFile);
+use Getopt::Std;
+my %opt;
+getopts('u', \%opt);  # -u to run Unix/cloc instead of ../cloc
 my @Tests = (
 
                {
@@ -398,22 +400,28 @@ my @Tests = (
                    'ref'  => '../tests/outputs/issues/472/not_really.lua.yaml',
                },
                {
-                   'name' => '--exclude-lang --diff 1/3, #476',
+                   'name' => '--exclude-lang --diff 1/4, #476',
                    'cd'   => '../tests/inputs/issues/476',
                    'args' => '--diff A B',
                    'ref'  => '../tests/outputs/issues/476/all.yaml',
                },
                {
-                   'name' => '--exclude-lang --diff 2/3, #476',
+                   'name' => '--exclude-lang --diff 2/4, #476',
                    'cd'   => '../tests/inputs/issues/476',
                    'args' => "--exclude-lang 'Fortran 90' --diff A B",
                    'ref'  => '../tests/outputs/issues/476/no_fortran.yaml',
                },
                {
-                   'name' => '--exclude-lang --diff 3/3, #476',
+                   'name' => '--exclude-lang --diff 3/4, #476',
                    'cd'   => '../tests/inputs/issues/476',
                    'args' => "--exclude-lang C++ --diff A B",
                    'ref'  => '../tests/outputs/issues/476/no_cpp.yaml',
+               },
+               {
+                   'name' => '--exclude-lang --diff 4/4, #989 (case insensitive)',
+                   'cd'   => '../tests/inputs/issues/476',
+                   'args' => "--exclude-lang 'fortran 90' --diff A B",
+                   'ref'  => '../tests/outputs/issues/476/no_fortran.yaml',
                },
                # Next test, 482, requires an empty directory B.  Git
                # does not like this so create it at runtime.
@@ -595,7 +603,7 @@ my @Tests = (
                {
                    'name' => '--csv-delimiter="#", #597',
                    'cd'   => '../tests/inputs/issues/597',
-                   'args' => '--csv-delimiter="#" .',
+                   'args' => '--csv-delimiter="#" --exclude-lang=CSV hello.C',
                    'ref'  => '../tests/outputs/issues/597/results.yaml',
                },
 
@@ -672,7 +680,7 @@ my @Tests = (
                {
                    'name' => '--csv-delimiter="|", #670',
                    'cd'   => '../tests/inputs/issues/670',
-                   'args' => '--csv-delimiter="|" .',
+                   'args' => '--csv-delimiter="|" --exclude-lang=CSV hello.C hi.py',
                    'ref'  => '../tests/outputs/issues/670/results.yaml',
                },
 
@@ -760,14 +768,201 @@ my @Tests = (
                     'ref'  => '../tests/outputs/issues/781/results.yaml',
                 },
 
+                {
+                    'name' => 'Java /* in string #804',
+                    'cd'   => '../tests/inputs/issues/804',
+                    'args' => 'infoSQL.java',
+                    'ref'  => '../tests/outputs/issues/804/infoSQL.java.yaml',
+                },
+
+                {
+                    'name' => 'comments in Java text blocks #805',
+                    'cd'   => '../tests/inputs/issues/805',
+                    'args' => 'text_block.java',
+                    'ref'  => '../tests/outputs/issues/805/text_block.java.yaml',
+                },
+
+                {
+                    'name' => 'Java text block start in comments #806',
+                    'cd'   => '../tests/inputs/issues/806',
+                    'args' => 'huffman.java',
+                    'ref'  => '../tests/outputs/issues/806/results.yaml',
+                },
+
+                {
+                    'name' => 'XML start block comment on line w/code #811',
+                    'cd'   => '../tests/inputs/issues/811',
+                    'args' => 'inline_comment.xml',
+                    'ref'  => '../tests/outputs/issues/811/inline_comment.xml.yaml',
+                },
+
+                {
+                    'name' => '"*/*", `*/*` in Go strings #816',
+                    'cd'   => '../tests/inputs/issues/816',
+                    'args' => '--strip-str-comments star_slash_star.go',
+                    'ref'  => '../tests/outputs/issues/816/results.yaml',
+                },
+
+                {
+                   'name' => '--fullpath issues/822 (github issue #822 T1)',
+                   'cd'   => '../tests/inputs',
+                   'args' => '--fullpath --not-match-f "^c.csv" issues/822',
+                   'ref'  => '../tests/outputs/issues/822/T1.yaml',
+                },
+
+                {
+                   'name' => '--fullpath issues/822 (github issue #822 T2)',
+                   'cd'   => '../tests/inputs',
+                   'args' => '--vcs git --fullpath --not-match-f "^c.csv" issues/822',
+                   'ref'  => '../tests/outputs/issues/822/T2.yaml',
+                },
+
+                {
+                   'name' => '--fullpath issues/822 (github issue #822 T3)',
+                   'cd'   => '../tests/inputs',
+                   'args' => '--fullpath --not-match-f "b/c.csv" issues/822',
+                   'ref'  => '../tests/outputs/issues/822/T3.yaml',
+                },
+
+                {
+                   'name' => '--fullpath issues/822 (github issue #822 T4)',
+                   'cd'   => '../tests/inputs',
+                   'args' => '--vcs git --fullpath --not-match-f "b/c.csv" issues/822',
+                   'ref'  => '../tests/outputs/issues/822/T4.yaml',
+                },
+
+                {
+                   'name' => '--fullpath issues/822 (github issue #822 T5)',
+                   'cd'   => '../tests/inputs',
+                   'args' => '--fullpath --not-match-d "^b" issues/822',
+                   'ref'  => '../tests/outputs/issues/822/T5.yaml',
+                },
+
+                {
+                   'name' => '--fullpath issues/822 (github issue #822 T6)',
+                   'cd'   => '../tests/inputs',
+                   'args' => '--vcs git --fullpath --not-match-d "^b" issues/822',
+                   'ref'  => '../tests/outputs/issues/822/T6.yaml',
+                },
+
+                {
+                   'name' => '--fullpath issues/822 (github issue #822 T7)',
+                   'cd'   => '../tests/inputs',
+                   'args' => '--fullpath --not-match-d "a/b" issues/822',
+                   'ref'  => '../tests/outputs/issues/822/T7.yaml',
+                },
+
+                {
+                   'name' => '--fullpath issues/822 (github issue #822 T8)',
+                   'cd'   => '../tests/inputs',
+                   'args' => '--vcs git --fullpath --not-match-d "a/b" issues/822',
+                   'ref'  => '../tests/outputs/issues/822/T8.yaml',
+                },
+
+                {
+                   'name' => '--not-match-d with trailing slash (github issue #833)',
+                   'cd'   => '../tests/inputs/issues/833',
+                   'args' => '. --not-match-d="/foo/"',
+                   'ref'  => '../tests/outputs/issues/833/results.yaml',
+                },
+
+                {
+                   'name' => '--match-f with --no-recurse (github issue #851)',
+                   'cd'   => '../tests/inputs/issues/851',
+                   'args' => "--match-f '.lua\$' --no-recurse level_1",
+                   'ref'  => '../tests/outputs/issues/851/results.yaml',
+                },
+
+                {
+                   'name' => '--ignore-regex (github issues #862, #865, #868)',
+                   'cd'   => '../tests/inputs/issues/862',
+                   'args' => '--ignore-regex="C,Fortran 77|^\\s*([{};]|END)\\s*\$" *.f *.c',
+                   'ref'  => '../tests/outputs/issues/862/results.yaml',
+                },
+
+                {
+                   'name' => '--ignore-regex --diff (github issues #862, #865, #868)',
+                   'cd'   => '../tests/inputs/issues/862',
+                   'args' => '--ignore-regex="*|import" --diff a.py b.py',
+                   'ref'  => '../tests/outputs/issues/862/diff_results.yaml',
+                },
+
+                # The filename tests/inputs/issues/898/irregular"file2.md
+                # is not legal on Windows.  Only test it on Unix-like systems.
+                {
+                   'name' => '--by-file output for JSON/YAML with filenames having embedded quotes (#897, #898)',
+                   'cd'   => '../tests/inputs/issues/898',
+                   'args' => '--by-file .', # default is YAML
+                   'ref'  => '../tests/outputs/issues/898/results.yaml',
+                },
+
+                {
+                   'name' => '--percent (#886)',
+                   'cd'   => '../tests/inputs/dd',
+                   'args' => '--percent .',
+                   'ref'  => '../tests/outputs/issues/886/results.yaml',
+                },
+
+                {
+                   'name' => '--percent --by-file (#886)',
+                   'cd'   => '../tests/inputs/dd',
+                   'args' => '--percent --by-file .',
+                   'ref'  => '../tests/outputs/issues/886/results_by_file.yaml',
+                },
+
+                {
+                   'name' => 'Python docstring with embedded "#" (#906)',
+                   'cd'   => '../tests/inputs/issues/906',
+                   'args' => '--diff previous_version.py current_version.py',
+                   'ref'  => '../tests/outputs/issues/906/results.yaml',
+                },
+
+                {
+                   'name' => 'nested archives (#974)',
+                   'cd'   => '../tests/inputs/issues/974',
+                   'args' => 'nested.tar.gz',
+                   'ref'  => '../tests/outputs/issues/974/nested.yaml',
+                },
+
+                {
+                   'name' => 'directory named like archive (#977)',
+                   'cd'   => '../tests/inputs/issues/977',
+                   'args' => 'foo.tar.gz',
+                   'ref'  => '../tests/outputs/issues/977/results.yaml',
+                },
+
+                {
+                   'name' => 'contents of a .gem file',
+                   'cd'   => '../tests/inputs',
+                   'args' => 'hello-0.0.0.gem', # .tar.gz inside .tar.gz
+                   'ref'  => '../tests/outputs/hello-0.0.0.gem.yaml',
+                },
+
             );
+
+my $ON_WINDOWS = 0;
+   $ON_WINDOWS = 1 if ($^O =~ /^MSWin/) or ($^O eq "Windows_NT");
+if ($ON_WINDOWS and $ENV{'SHELL'}) {
+    if ($ENV{'SHELL'} =~ m{^/}) {
+        $ON_WINDOWS = 0;  # make Cygwin look like Unix
+    } else {
+        $ON_WINDOWS = 1;  # MKS defines $SHELL but still acts like Windows
+    }
+}
+my $ON_MINGW64 = 0; # git-bash on Windows has special needs
+if (!$ON_WINDOWS and defined $ENV{'SSH_ASKPASS'} and $ENV{'SSH_ASKPASS'} =~ m{^/mingw64/}) {
+    $ON_MINGW64 = 1;
+}
 
 # Special cases:
 
-# Create test input for issue #132 which needs data not in the git repo.
+# 132: Create test input which needs data not in the git repo.
 # Silently fail if file/dir already exists.
 mkdir "../tests/inputs/issues/132/ignore_git";
 cp    "../tests/inputs/hi.py", "../tests/inputs/issues/132/ignore_git/";
+
+# 898
+make_898_weird_filename() unless $ON_WINDOWS;
 
 # Issues #540, #544 regarding case preservation on file systems
 # that are case insensitive:  git issues a warning about the
@@ -786,10 +981,14 @@ if (!-d $missing_dir) {
 my $Verbose = 0;
 
 my $results = 'results.yaml';
-my $cloc     = "$work_dir/../cloc";   # all-purpose version
-#my $cloc     = "$work_dir/cloc";      # Unix-tuned version
+my $cloc    = "$work_dir/../cloc";                 # all-purpose version
+   $cloc    = "$work_dir/cloc" if defined $opt{u}; # Unix-tuned version
 my $Run = "$cloc --quiet --yaml --out $results ";
 foreach my $t (@Tests) {
+    if ($t->{'name'} =~ /#898/ and $ON_WINDOWS) {
+        print "Skipping test $t->{'name'} on Windows.\n";
+        next;
+    }
     chdir($t->{'cd'}) if defined $t->{'cd'};
     print "Run  dir= ", cwd(), "\n" if $Verbose;
     print  $Run . $t->{'args'} if $Verbose;
@@ -810,7 +1009,158 @@ foreach my $t (@Tests) {
 
     is_deeply(\%ref, \%this, $t->{'name'} . " results match");
 }
+
+# Issue #967: --fmt with --by-percent emitted "Use of uninitialized value"
+# warnings and zeroed counts because the JSON it round-trips uses
+# blank_pct/comment_pct/code_pct keys that print_format_n didn't read.
+# A related defect: --by-percent=cm divided by zero whenever any entry
+# had code+comment == 0 (e.g. tests/inputs/issues/644/UInt8.cs).
+{
+    chdir("../tests/inputs/dd");
+    my $stderr_file = "$work_dir/by_percent_fmt_stderr.txt";
+    my $stdout_file = "$work_dir/by_percent_fmt_stdout.txt";
+    my $cmd = "$cloc --fmt=4 --by-percent=cm . > $stdout_file 2> $stderr_file";
+    system($cmd);
+    chdir($work_dir);
+    my $stderr = do { local (@ARGV, $/) = $stderr_file; <> } // "";
+    my $stdout = do { local (@ARGV, $/) = $stdout_file; <> } // "";
+    unlink $stderr_file, $stdout_file unless $Verbose;
+    unlike($stderr, qr/Use of uninitialized value/,
+           "issue #967: --fmt=4 --by-percent=cm emits no uninitialized warnings");
+    like($stdout, qr/\d+\.\d+/,
+         "issue #967: --fmt=4 --by-percent=cm produces non-zero output");
+}
+
+# Division-by-zero regression in --by-percent=cm when any entry has
+# code+comment == 0. Run against the full tests/inputs corpus, which
+# contains tests/inputs/issues/644/UInt8.cs (code=0, comment=0, blank=1).
+# Also assert that the empty-content file shows 0.00 for all three
+# percentage columns (rather than crashing or showing NaN/uninit).
+{
+    foreach my $fmt (qw(3 4)) {
+        my $stderr_file = "$work_dir/dz_fmt${fmt}_stderr.txt";
+        my $stdout_file = "$work_dir/dz_fmt${fmt}_stdout.txt";
+        my $cmd = "$cloc --fmt=$fmt --by-percent=cm ../tests/inputs"
+                . " > $stdout_file 2> $stderr_file";
+        system($cmd);
+        my $stderr = do { local (@ARGV, $/) = $stderr_file; <> } // "";
+        my $stdout = do { local (@ARGV, $/) = $stdout_file; <> } // "";
+        unlink $stderr_file, $stdout_file unless $Verbose;
+        unlike($stderr, qr/Illegal division by zero/,
+               "no division-by-zero with --fmt=$fmt --by-percent=cm");
+        # The line for issues/644/UInt8.cs (code=0, comment=0, blank=1)
+        # must show 0.00 across all three percentage columns.
+        my ($empty_line) = grep { /issues\/644\/UInt8\.cs/ } split /\n/, $stdout;
+        like($empty_line // "", qr/\b0\.00\b.*\b0\.00\b.*\b0\.00\b/,
+             "--fmt=$fmt --by-percent=cm: empty file shows 0.00/0.00/0.00");
+    }
+}
+
+# SUM row regression: with --fmt and --by-percent, the SUM line must show
+# aggregate percentages (computed from total counts), not the sum of
+# per-row percentages. Compare against the non-fmt text path which
+# already produces the correct aggregate.
+{
+    my $baseline_file = "$work_dir/sum_baseline.txt";
+    system("$cloc --by-percent=cm ../tests/inputs > $baseline_file 2>/dev/null");
+    my $baseline = do { local (@ARGV, $/) = $baseline_file; <> } // "";
+    unlink $baseline_file unless $Verbose;
+    my ($baseline_sum) = grep { /^SUM:\s/ } split /\n/, $baseline;
+    my @baseline_pct = $baseline_sum =~ /(\d+\.\d{2})/g;
+
+    foreach my $fmt (qw(1 2 3 4 5)) {
+        my $out_file = "$work_dir/sum_fmt${fmt}.txt";
+        system("$cloc --fmt=$fmt --by-percent=cm ../tests/inputs"
+             . " > $out_file 2>/dev/null");
+        my $stdout = do { local (@ARGV, $/) = $out_file; <> } // "";
+        unlink $out_file unless $Verbose;
+        my ($sum_line) = grep { /^SUM\b/ } split /\n/, $stdout;
+        my @fmt_pct = $sum_line =~ /(\d+\.\d{2})/g;
+        # Each format's SUM should contain the three baseline aggregate
+        # percentages somewhere in the row. Format 2/4/5 also have a Total
+        # column appended; format 1/3 do not. We assert the first three
+        # blank/comment/code aggregates match the baseline.
+        is_deeply([@fmt_pct[0..2]], [@baseline_pct[0..2]],
+                  "--fmt=$fmt --by-percent=cm: SUM row uses aggregate, not sum-of-percentages");
+    }
+}
+
+# --total: adds a Total column (sum of blank, comment, code) to each
+# language/file row and to the SUM row, across output styles.
+{
+    chdir("../tests/inputs/dd");
+    my $out_file = "$work_dir/total.yaml";
+    my $cmd = "$cloc --quiet --hide-rate --total --yaml --out $out_file .";
+    system($cmd);
+    chdir($work_dir);
+    my %total_counts = load_yaml($out_file);
+    unlink $out_file unless $Verbose;
+    my $ok_total = 1;
+    foreach my $lang (keys %total_counts) {
+        my %fields = %{$total_counts{$lang}};
+        next unless defined $fields{'code'};   # skip non-language sections
+        my $sum = $fields{'blank'} + $fields{'comment'} + $fields{'code'};
+        $ok_total = 0 if $fields{'total'} != $sum;
+    }
+    ok($ok_total, "--total yaml: every total equals blank+comment+code");
+}
+
+{
+    chdir("../tests/inputs/dd");
+    my $out_file = "$work_dir/total.txt";
+    system("$cloc --quiet --hide-rate --total --out $out_file .");
+    chdir($work_dir);
+    my $stdout = do { local (@ARGV, $/) = $out_file; <> } // "";
+    unlink $out_file unless $Verbose;
+    like($stdout, qr/\bTotal\s*$/m, "--total txt: Total column header present");
+    my $rows_ok = 1;
+    foreach my $line (split /\n/, $stdout) {
+        # data and SUM rows end with: blank comment code total
+        next unless $line =~ /(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*$/;
+        my ($b, $c, $co, $t) = ($1, $2, $3, $4);
+        $rows_ok = 0 if $t != $b + $c + $co;
+    }
+    ok($rows_ok, "--total txt: row totals equal blank+comment+code");
+}
+
+{
+    chdir("../tests/inputs/dd");
+    my $out_file = "$work_dir/no_total.txt";
+    system("$cloc --quiet --hide-rate --out $out_file .");
+    chdir($work_dir);
+    my $stdout = do { local (@ARGV, $/) = $out_file; <> } // "";
+    unlink $out_file unless $Verbose;
+    unlike($stdout, qr/Total/, "default txt output has no Total column");
+}
+
+{
+    chdir("../tests/inputs/dd");
+    my $out_file = "$work_dir/total.json";
+    system("$cloc --quiet --hide-rate --total --json --out $out_file .");
+    chdir($work_dir);
+    my $stdout = do { local (@ARGV, $/) = $out_file; <> } // "";
+    unlink $out_file unless $Verbose;
+    like($stdout, qr/"total":\s*\d+/, "--total json: total field present");
+}
+
+{
+    chdir("../tests/inputs/dd");
+    my $f1 = "$work_dir/total_r1.txt";
+    my $f2 = "$work_dir/total_r2.txt";
+    system("$cloc --quiet --hide-rate --total --out $f1 .");
+    system("$cloc --quiet --hide-rate --total --out $f2 .");
+    my $sum_out = "$work_dir/total_sum.txt";
+    system("$cloc --quiet --hide-rate --sum-reports --total --out $sum_out $f1 $f2");
+    chdir($work_dir);
+    # --sum-reports writes two files: one by language, one by report file
+    my $stdout = do { local (@ARGV, $/) = "$sum_out.lang"; <> } // "";
+    unlink $f1, $f2, "$sum_out.lang", "$sum_out.file" unless $Verbose;
+    like($stdout, qr/^SUM:\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s*$/m,
+         "--sum-reports can combine reports made with --total");
+}
+
 done_testing();
+print "Finished testing $cloc\n";
 
 sub load_yaml { # {{{1
     my ($file, ) = @_;
@@ -836,4 +1186,31 @@ sub load_yaml { # {{{1
     }
     close IN;
     return %result
+} # 1}}}
+sub make_898_weird_filename { # {{{1
+    my $parent_dir = "../tests/inputs/issues/898";
+    if (!-d $parent_dir) {
+        print "Cannot find $parent_dir, skipping test 898.\n";
+        return 0;
+    }
+    my $weird_filename = 'irregular"file2.md';
+    my $content = <<'EOF';
+---
+id: 5dc174fcf86c76b9248c6eb3
+title: Step 3
+challengeType: 0
+dashedName: step-2
+demoType: onLoad                                                                                                                 ---
+
+# --description--
+
+In this workshop, you will learn how to work with basic HTML elements like
+headings.
+
+EOF
+    open OUT , ">$parent_dir/$weird_filename" or die "Cannot write to  $weird_filename : $!";
+    print OUT $content;
+    close OUT;
+
+    return 1;
 } # 1}}}

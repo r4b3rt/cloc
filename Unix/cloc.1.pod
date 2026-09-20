@@ -1,6 +1,6 @@
 #   Copyright
 #
-#      Copyright (C) 2018-2023 Al Danial <al.danial@gmail.com>.
+#      Copyright (C) 2018-2026 Al Danial <al.danial@gmail.com>.
 #      Copyright (C) 2010-2017 Jari Aalto <jari.aalto@cante.net>
 #
 #   License
@@ -293,6 +293,29 @@ C++; this switch would count .C files as C rather
 than C++ on *nix operating systems).  File name
 case insensitivity is always true on Windows.
 
+=item B<--ignore-regex>
+
+Ignore lines in source files that match the given
+Perl regular expression for the given language(s).
+This option can be specified multiple times.
+Language names are comma separated and are followed
+by the pipe character and the regular expression.
+Use * to match all languages.
+Examples:
+
+  --ignore-regex='C,Java,C++|^\s*[{};]\s*$'
+  --ignore-regex='*|DEBUG|TEST\s+ONLY'
+
+These filters are applied after comments are
+removed.  Use --strip-comments=EXT to create
+new files that show these filters applied.
+The primary use case is to ignore lines
+containing only braces, brackets, or puctuation.
+
+=item B<--include-submodules>
+
+When using B<--vcs=git>, include files in git submodules.
+
 =item B<--lang-no-ext=LANG>
 
 Count files without extensions using the LANG counter.  This option
@@ -402,6 +425,14 @@ See also B<--follow-links>.
 =item B<--stdin-name=FILE>
 
 Count lines streamed via I<STDIN> as if they came from a file named FILE.
+
+=item B<--strip-code=EXT>
+
+For each file processed, write to the current directory a version of
+the file which has blank and code lines removed.
+The name of each stripped file is the original file name with
+C<.EXT> appended to it. It is written to the current directory unless
+B<--original-dir> is on.
 
 =item B<--strip-comments=EXT>
 
@@ -606,6 +637,7 @@ names of categorized files to FILE.
 =item B<--counted=FILE>
 
 Save names of processed source files to FILE.
+See also B<--found>, B<--ignored>, B<--unique>.
 
 =item B<--diff-alignment=FILE>
 
@@ -628,11 +660,13 @@ Print cloc's internal usage information and exit.
 
 =item B<--found=FILE>
 
-Save names of every file found to FILE.
+Save names of every file found to FILE.  See also B<--counted>,
+B<--ignored>, B<--unique>.
 
 =item B<--ignored=FILE>
 
 Save names of ignored files and the reason they were ignored to FILE.
+See also B<--counted>, B<--found>, B<--unique>.
 
 =item B<--print-filter-stages>
 
@@ -644,6 +678,10 @@ applied.
 Print information about all known (or just the given) file extensions
 and exit.
 
+=item B<--show-errors[=EXT]>
+
+Used with B<--quiet>, print error messages (if any).
+
 =item B<--show-lang[=LANG]>
 
 Print information about all known (or just the given) languages and
@@ -653,6 +691,16 @@ exit.
 
 Print the value of the operating system mode and exit.  See also
 B<--unix>, B<--windows>.
+
+=item B<--quiet>
+
+Suppress all information messages except the final output.
+See also B<--shwow-errors>.
+
+=item B<--unique=FILE>
+
+Save names of ignored files and the reason they were ignored to FILE.
+See also B<--counted>, B<--found>, B<--ignored>.
 
 =item B<-v[=N]>
 
@@ -723,6 +771,21 @@ the default ASCII (B<E> = 'UTF-7').  Examples: 'UTF-16',
 'euc-kr', 'iso-8859-16'.  Known encodings can be
 printed with
   perl -MEncode -e 'print join("\n", Encode->encodings(":all")), "\n"'
+
+=item B<--fmt=N>
+
+Alternate text output format where B<N> is a number
+from 1 to 5, or -1 to -5. 'total lines' means the
+sum of code, comment, and blank lines.  Negative
+values are the same as the positive values but retain,
+instead of deleting, the intermediate JSON file that
+is written.  The JSON file name is randomly generated
+unless --out/--report-file is given.  The formats are:
+  1:  by language (same as cloc default output)
+  2:  by language with an extra column for total lines
+  3:  by file with language
+  4:  by file with a total lines column
+  5:  by file with language and a total lines column
 
 =item B<--hide-rate>
 
@@ -858,7 +921,7 @@ sloccount(1)
 =head1 AUTHORS
 
 The cloc program was written by Al Danial <al.danial@gmail.com> and
-is Copyright (C) 2006-2023 <al.danial@gmail.com>.
+is Copyright (C) 2006-2026 <al.danial@gmail.com>.
 
 The manual page was originally written by Jari Aalto <jari.aalto@cante.net>.
 

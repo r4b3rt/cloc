@@ -3,11 +3,29 @@ use warnings;
 use strict;
 use Test::More;
 use Cwd;
+use Getopt::Std;
+my %opt;
+getopts('u', \%opt);  # -u to run Unix/cloc instead of ../cloc
 my @Tests = (
+                {
+                    'name' => 'Activiti Business Process',
+                    'ref'  => '../tests/outputs/955.tld.yaml',
+                    'args' => '../tests/inputs/955.tld',
+                },
                 {
                     'name' => 'Agda',
                     'ref'  => '../tests/outputs/Lookup.agda.yaml',
                     'args' => '../tests/inputs/Lookup.agda',
+                },
+                {
+                    'name' => 'AL',
+                    'ref'  => '../tests/outputs/AL.al.yaml',
+                    'args' => '../tests/inputs/AL.al',
+                },
+                {
+                    'name' => 'AL 2 (Perl AutoLoader, same extension)',
+                    'ref'  => '../tests/outputs/perl_autoloader.al.yaml',
+                    'args' => '../tests/inputs/perl_autoloader.al',
                 },
                 {
                     'name' => 'AnsProlog',
@@ -40,9 +58,19 @@ my @Tests = (
                     'args' => '../tests/inputs/send_msg.applescript',
                 },
                 {
+                    'name' => 'Aria',
+                    'ref'  => '../tests/outputs/github_user.aria.yaml',
+                    'args' => '../tests/inputs/github_user.aria',
+                },
+                {
                     'name' => 'ArkTs',
                     'ref'  => '../tests/outputs/openharmony.ets.yaml',
                     'args' => '../tests/inputs/openharmony.ets',
+                },
+                {
+                    'name' => 'Arturo',
+                    'ref'  => '../tests/outputs/Arturo.art.yaml',
+                    'args' => '../tests/inputs/Arturo.art',
                 },
                 {
                     'name' => 'AsciiDoc',
@@ -85,9 +113,31 @@ my @Tests = (
                     'args' => '../tests/inputs/cad.asy',
                 },
                 {
+                    'name' => 'AXAML', 
+                    'ref'  => '../tests/outputs/HelpersView.axaml.yaml',
+                    'args' => '../tests/inputs/HelpersView.axaml',
+                },
+                {
                     'name' => 'Bazel',
                     'ref'  => '../tests/outputs/BUILD.yaml',
                     'args' => '../tests/inputs/BUILD',
+                },
+                {
+                    'name' => 'Beluga',
+                    'ref'  => '../tests/outputs/beluga.bel.yaml',
+                    'args' => '../tests/inputs/beluga.bel',
+                },
+                {
+                    'name' => 'Bicep',
+                    'ref'  => '../tests/outputs/sample.bicep.yaml',
+                    'args' => '../tests/inputs/sample.bicep',
+                },
+                {
+                    'name' => 'BitBake',
+                    'ref'  => '../tests/outputs/bitbake.yaml',
+                    'args' => '../tests/inputs/hello_1.0.bb ' .
+                              '../tests/inputs/cpp-example.inc ' .
+                              '../tests/inputs/layer.conf ',
                 },
                 {
                     'name' => 'BizTalk Orchestration',
@@ -103,6 +153,11 @@ my @Tests = (
                     'name' => 'Blade',
                     'ref'  => '../tests/outputs/master.blade.php.yaml',
                     'args' => '../tests/inputs/master.blade.php',
+                },
+                {
+                    'name' => 'Blueprint',
+                    'ref'  => '../tests/outputs/window.blp.yaml',
+                    'args' => '../tests/inputs/window.blp',
                 },
                 {
                     'name' => 'Brainfuck',
@@ -155,6 +210,16 @@ my @Tests = (
                     'args' => '../tests/inputs/build.cake',
                 },
                 {
+                    'name' => 'Cangjie',
+                    'ref'  => '../tests/outputs/functional.cj.yaml',
+                    'args' => '../tests/inputs/functional.cj',
+                },
+                {
+                    'name' => 'Clojure',
+                    'ref'  => '../tests/outputs/ch10-REPL-oriented-repl-interactions.cj.yaml',
+                    'args' => '../tests/inputs/ch10-REPL-oriented-repl-interactions.cj',
+                },
+                {
                     'name' => 'Circom',
                     'ref'  => '../tests/outputs/eddsa.circom.yaml',
                     'args' => '../tests/inputs/eddsa.circom',
@@ -190,6 +255,11 @@ my @Tests = (
                     'args' => '../tests/inputs/Buchberger.cocoa5',
                 },
                 {
+                    'name' => 'CodeQL',
+                    'ref'  => '../tests/outputs/CodeQL.ql.yaml',
+                    'args' => '../tests/inputs/CodeQL.ql',
+                },
+                {
                     'name' => 'ColdFusion',
                     'ref'  => '../tests/outputs/ColdFusion.cfm.yaml',
                     'args' => '../tests/inputs/ColdFusion.cfm',
@@ -220,6 +290,11 @@ my @Tests = (
                     'args' => '../tests/inputs/C++-uppercase.CPP',
                 },
                 {
+                    'name' => 'Cadence',
+                    'ref'  => '../tests/outputs/cadence_test.cdc.yaml',
+                    'args' => '../tests/inputs/cadence_test.cdc',
+                },
+                {
                     'name' => 'Carbon',
                     'ref'  => '../tests/outputs/variable_length.carbon.yaml',
                     'args' => '../tests/inputs/variable_length.carbon',
@@ -228,6 +303,21 @@ my @Tests = (
                     'name' => 'C simple',
                     'ref'  => '../tests/outputs/C-Ansi.c.yaml',
                     'args' => '../tests/inputs/C-Ansi.c',
+                },
+                {
+                    'name' => 'Civet',
+                    'ref'  => '../tests/outputs/parser_1.civet.yaml',
+                    'args' => '../tests/inputs/parser_1.civet',
+                },
+                {
+                    'name' => 'Civet (coffeeComment)',
+                    'ref'  => '../tests/outputs/parser_2.civet.yaml',
+                    'args' => '../tests/inputs/parser_2.civet',
+                },
+                {
+                    'name' => 'Clarity',
+                    'ref'  => '../tests/outputs/clarityfiles.clar.yaml',
+                    'args' => '../tests/inputs/clarityfiles.clar',
                 },
                 {
                     'name' => 'CSV',
@@ -240,9 +330,19 @@ my @Tests = (
                     'args' => '../tests/inputs/cucumber.feature',
                 },
                 {
+                    'name' => 'C3',
+                    'ref'  => '../tests/outputs/io.c3.yaml',
+                    'args' => '../tests/inputs/io.c3',
+                },
+                {
                     'name' => 'Dafny',
                     'ref'  => '../tests/outputs/fib.dfy.yaml',
                     'args' => '../tests/inputs/fib.dfy',
+                },
+                {
+                    'name' => 'DAML',
+                    'ref'  => '../tests/outputs/Test.daml.yaml',
+                    'args' => '../tests/inputs/Test.daml',
                 },
                 {
                     'name' => 'DenizenScript',
@@ -310,6 +410,11 @@ my @Tests = (
                     'args' => '../tests/inputs/elixir.ex',
                 },
                 {
+                    'name' => 'Elixir Script',
+                    'ref'  => '../tests/outputs/dev.exs.yaml',
+                    'args' => '../tests/inputs/dev.exs',
+                },
+                {
                     'name' => 'Embedded Crystal',
                     'ref'  => '../tests/outputs/capture.ecr.yaml',
                     'args' => '../tests/inputs/capture.ecr',
@@ -355,6 +460,11 @@ my @Tests = (
                     'args' => '../tests/inputs/hello.f90',
                 },
                 {
+                    'name' => 'Fortran 2003',
+                    'ref'  => '../tests/outputs/main.f03.yaml',
+                    'args' => '../tests/inputs/main.f03',
+                },
+                {
                     'name' => 'Freemarker Template',
                     'ref'  => '../tests/outputs/FreemarkerTemplate.ftl.yaml',
                     'args' => '../tests/inputs/FreemarkerTemplate.ftl',
@@ -398,6 +508,16 @@ my @Tests = (
                     'name' => 'Gleam',
                     'ref'  => '../tests/outputs/string.gleam.yaml',
                     'args' => '../tests/inputs/string.gleam',
+                },
+                {
+                    'name' => 'Glimmer JavaScript',
+                    'ref'  => '../tests/outputs/body.gjs.yaml',
+                    'args' => '../tests/inputs/body.gjs',
+                },
+                {
+                    'name' => 'Glimmer TypeScript',
+                    'ref'  => '../tests/outputs/input.gts.yaml',
+                    'args' => '../tests/inputs/input.gts',
                 },
                 {
                     'name' => 'GLSL',
@@ -482,6 +602,11 @@ my @Tests = (
                     'args' => '../tests/inputs/test.hs',
                 },
                 {
+                    'name' => 'Haskell Boot',
+                    'ref'  => '../tests/outputs/Splice.hs-boot.yaml',
+                    'args' => '../tests/inputs/Splice.hs-boot',
+                },
+                {
                     'name' => 'Haxe',
                     'ref'  => '../tests/outputs/Sys.hx.yaml',
                     'args' => '../tests/inputs/Sys.hx',
@@ -490,6 +615,11 @@ my @Tests = (
                     'name' => 'HCL',
                     'ref'  => '../tests/outputs/nomad_job.hcl.yaml',
                     'args' => '../tests/inputs/nomad_job.hcl',
+                },
+                {
+                    'name' => 'Hibernate',
+                    'ref'  => '../tests/outputs/955.hbm.xml.yaml',
+                    'args' => '../tests/inputs/955.hbm.xml',
                 },
                 {
                     'name' => 'HolyC',
@@ -552,6 +682,11 @@ my @Tests = (
                     'args' => '../tests/inputs/poly_constructor.jai',
                 },
                 {
+                    'name' => 'Janet',
+                    'ref'  => '../tests/outputs/args.janet.yaml',
+                    'args' => '../tests/inputs/args.janet',
+                },
+                {
                     'name' => 'Java',
                     'ref'  => '../tests/outputs/Java.java.yaml',
                     'args' => '../tests/inputs/Java.java',
@@ -562,14 +697,14 @@ my @Tests = (
                     'args' => '../tests/inputs/offline.jcl',
                 },
                 {
-                    'name' => 'JSON',
-                    'ref'  => '../tests/outputs/glossary.json.yaml',
-                    'args' => '../tests/inputs/glossary.json',
-                },
-                {
                     'name' => 'Jinja Templates',
                     'ref'  => '../tests/outputs/child_template.jinja2.yaml',
                     'args' => '../tests/inputs/child_template.jinja2',
+                },
+                {
+                    'name' => 'JSON',
+                    'ref'  => '../tests/outputs/glossary.json.yaml',
+                    'args' => '../tests/inputs/glossary.json',
                 },
                 {
                     'name' => 'JSON5',
@@ -577,9 +712,29 @@ my @Tests = (
                     'args' => '../tests/inputs/glossary.json5',
                 },
                 {
+                    'name' => 'Jsonnet',
+                    'ref'  => '../tests/outputs/inner_ref.jsonnet.yaml',
+                    'args' => '../tests/inputs/inner_ref.jsonnet',
+                },
+                {
+                    'name' => 'Jasper Report XML/Template',
+                    'ref'  => '../tests/outputs/955.jrxml.yaml',
+                    'args' => '../tests/inputs/955.jrxml',
+                },
+                {
+                    'name' => 'JSP Tag Library Definition',
+                    'ref'  => '../tests/outputs/955.tld.yaml',
+                    'args' => '../tests/inputs/955.tld',
+                },
+                {
                     'name' => 'Jupyter Notebook',
                     'ref'  => '../tests/outputs/Trapezoid_Rule.ipynb.yaml',
                     'args' => '../tests/inputs/Trapezoid_Rule.ipynb',
+                },
+                {
+                    'name' => 'Julia',
+                    'ref'  => '../tests/outputs/julia.jl.yaml',
+                    'args' => '../tests/inputs/julia.jl',
                 },
                 {
                     'name' => 'Juniper Junos',
@@ -587,9 +742,9 @@ my @Tests = (
                     'args' => '../tests/inputs/config.junos',
                 },
                 {
-                    'name' => 'Julia',
-                    'ref'  => '../tests/outputs/julia.jl.yaml',
-                    'args' => '../tests/inputs/julia.jl',
+                    'name' => 'Justfile',
+                    'ref'  => '../tests/outputs/cross-platform.just.yaml',
+                    'args' => '../tests/inputs/cross-platform.just',
                 },
                 {
                     'name' => 'kvlang',
@@ -617,14 +772,19 @@ my @Tests = (
                     'args' => '../tests/inputs/ping_pong.lfe',
                 },
                 {
-                    'name' => 'Lisp',
-                    'ref'  => '../tests/outputs/sharpsign.cl.yaml',
-                    'args' => '../tests/inputs/sharpsign.cl',
-                },
-                {
                     'name' => 'Linker Script',
                     'ref'  => '../tests/outputs/linker.ld.yaml',
                     'args' => '../tests/inputs/linker.ld',
+                },
+                {
+                    'name' => 'Liquibase',
+                    'ref'  => '../tests/outputs/955.lb.xml.yaml',
+                    'args' => '../tests/inputs/955.lb.xml',
+                },
+                {
+                    'name' => 'Lisp',
+                    'ref'  => '../tests/outputs/sharpsign.cl.yaml',
+                    'args' => '../tests/inputs/sharpsign.cl',
                 },
                 {
                     'name' => 'Literate Idris',
@@ -662,6 +822,11 @@ my @Tests = (
                     'args' => '../tests/inputs/nested.lua',
                 },
                 {
+                    'name' => 'Luau',
+                    'ref'  => '../tests/outputs/basic.luau.yaml',
+                    'args' => '../tests/inputs/basic.luau',
+                },
+                {
                     'name' => 'Makefile',
                     'ref'  => '../tests/outputs/Makefile.yaml',
                     'args' => '../tests/inputs/Makefile',
@@ -675,6 +840,11 @@ my @Tests = (
                     'name' => 'Mako',
                     'ref'  => '../tests/outputs/Mako.mako.yaml',
                     'args' => '../tests/inputs/Mako.mako',
+                },
+                {
+                    'name' => 'Magik',
+                    'ref'  => '../tests/outputs/magikfile.magik.yaml',
+                    'args' => '../tests/inputs/magikfile.magik',
                 },
                 {
                     'name' => 'Mathematica',
@@ -712,9 +882,25 @@ my @Tests = (
                     'args' => '../tests/inputs/RenderTest.metal',
                 },
                 {
-                    'name' => 'Mojo',
+                    'name' => 'Modelica',
+                    'ref'  => '../tests/outputs/SimpleODE.mo.yaml',
+                    'args' => '../tests/inputs/SimpleODE.mo',
+                },
+                {
+                    'name' => 'Mojom',
                     'ref'  => '../tests/outputs/Mojo.mojom.yaml',
                     'args' => '../tests/inputs/Mojo.mojom',
+                },
+                {
+                    'name' => 'Mojo',
+                    'ref'  => '../tests/outputs/hi.mojo.yaml',
+                    'args' => '../tests/inputs/hi.mojo',
+                },
+                {
+                    'name' => 'MoonBit',
+                    'ref'  => '../tests/outputs/moonbit.yaml',
+                    'args' => '../tests/inputs/moonbit.mbt ' .
+                              '../tests/inputs/moonbit.mbti ',
                 },
                 {
                     'name' => 'Mumps',
@@ -737,9 +923,24 @@ my @Tests = (
                     'args' => '../tests/inputs/drupal.mxml',
                 },
                 {
+                    'name' => '.NET IL',
+                    'ref'  => '../tests/outputs/dotNET_intermediate.il.yaml',
+                    'args' => '../tests/inputs/dotNET_intermediate.il',
+                },
+                {
                     'name' => 'NetLogo',
                     'ref'  => '../tests/outputs/vinos.nlogo.yaml',
                     'args' => '../tests/inputs/vinos.nlogo',
+                },
+                {
+                    'name' => 'Nextflow',
+                    'ref'  => '../tests/outputs/cli-args.nf.yaml',
+                    'args' => '../tests/inputs/cli-args.nf',
+                },
+                {
+                    'name' => 'Nickel',
+                    'ref'  => '../tests/outputs/fibonacci.ncl.yaml',
+                    'args' => '../tests/inputs/fibonacci.ncl',
                 },
                 {
                     'name' => 'Nim',
@@ -757,6 +958,16 @@ my @Tests = (
                     'args' => '../tests/inputs/child_template.njk',
                 },
                 {
+                    'name' => 'Nushell',
+                    'ref'  => '../tests/outputs/nu-example.nu.yaml',
+                    'args' => '../tests/inputs/nu-example.nu',
+                },
+                {
+                    'name' => 'Nushell Object Notation',
+                    'ref'  => '../tests/outputs/nuon-example.nuon.yaml',
+                    'args' => '../tests/inputs/nuon-example.nuon',
+                },
+                {
                     'name' => 'Objective-C',
                     'ref'  => '../tests/outputs/qsort_demo.m.yaml',
                     'args' => '../tests/inputs/qsort_demo.m',
@@ -771,15 +982,40 @@ my @Tests = (
                     'ref'  => '../tests/outputs/Rounds.scad.yaml',
                     'args' => '../tests/inputs/Rounds.scad',
                 },
+
                 {
-                    'name' => 'Oracle PL/SQL',
+                    'name' => 'Oracle PL/SQL 1',
                     'ref'  => '../tests/outputs/bubs_tak_ard.prc.yaml',
                     'args' => '../tests/inputs/bubs_tak_ard.prc',
                 },
+
+                {
+                    'name' => 'Oracle PL/SQL 2',
+                    'ref'  => '../tests/outputs/issue_875.bdy.yaml',
+                    'args' => '../tests/inputs/issue_875.bdy',
+                },
+
+                {
+                    'name' => 'Org Mode',
+                    'ref'  => '../tests/outputs/orgmode.org.yaml',
+                    'args' => '../tests/inputs/orgmode.org',
+                },
+
                 {
                     'name' => 'P4',
                     'ref'  => '../tests/outputs/basic.p4.yaml',
                     'args' => '../tests/inputs/basic.p4',
+                },
+                {
+                    'name' => 'Pawn',
+                    'ref'  => '../tests/outputs/pawn.yaml',
+                    'args' => '../tests/inputs/fortran.inc ' .
+                              '../tests/inputs/hanoi.inc ' .
+                              '../tests/inputs/pascal.inc ' .
+                              '../tests/inputs/test1.inc ' .
+                              '../tests/inputs/assembly.inc ' .
+                              '../tests/inputs/Pascal.p ' .
+                              '../tests/inputs/queue.p ',
                 },
                 {
                     'name' => 'Pascal',
@@ -817,6 +1053,16 @@ my @Tests = (
                     'args' => '../tests/inputs/sdp_parser.peggy',
                 },
                 {
+                    'name' => 'Pek',
+                    'ref'  => '../tests/outputs/pek_example.pek.yaml',
+                    'args' => '../tests/inputs/pek_example.pek',
+                },
+                {
+                    'name' => 'Perl',
+                    'ref'  => '../tests/outputs/with_pod.pl.yaml',
+                    'args' => '../tests/inputs/with_pod.pl',
+                },
+                {
                     'name' => 'Pest',
                     'ref'  => '../tests/outputs/toml.pest.yaml',
                     'args' => '../tests/inputs/toml.pest',
@@ -835,6 +1081,11 @@ my @Tests = (
                     'name' => 'Pig Latin',
                     'ref'  => '../tests/outputs/script1-hadoop.pig.yaml',
                     'args' => '../tests/inputs/script1-hadoop.pig',
+                },
+                {
+                    'name' => 'Pkl',
+                    'ref'  => '../tests/outputs/fib_class.pkl.yaml',
+                    'args' => '../tests/inputs/fib_class.pkl',
                 },
                 {
                     'name' => 'PL/I',
@@ -870,6 +1121,11 @@ my @Tests = (
                     'name' => 'Prisma Schema',
                     'ref'  => '../tests/outputs/schema.prisma.yaml',
                     'args' => '../tests/inputs/schema.prisma',
+                },
+                {
+                    'name' => 'Processing',
+                    'ref'  => '../tests/outputs/pointillism.pde.yaml',
+                    'args' => '../tests/inputs/pointillism.pde',
                 },
                 {
                     'name' => 'ProGuard',
@@ -922,6 +1178,11 @@ my @Tests = (
                     'args' => '../tests/inputs/test-1.0-py2.py3-none-win32.whl',
                 },
                 {
+                    'name' => 'Quxlang',
+                    'ref'  => '../tests/outputs/sample.qxs.yaml',
+                    'args' => '../tests/inputs/sample.qxs',
+                },
+                {
                     'name' => 'Qt Linguist',
                     'ref'  => '../tests/outputs/i18n_de.ts.yaml',
                     'args' => '../tests/inputs/i18n_de.ts',
@@ -972,6 +1233,11 @@ my @Tests = (
                     'args' => '../tests/inputs/LogMain.re',
                 },
                 {
+                    'name' => 'Rego',
+                    'ref'  => '../tests/outputs/test.rego.yaml',
+                    'args' => '../tests/inputs/test.rego',
+                },
+                {
                     'name' => 'ReScript',
                     'ref'  => '../tests/outputs/RedBlackTree.res.yaml',
                     'args' => '../tests/inputs/RedBlackTree.res',
@@ -980,6 +1246,11 @@ my @Tests = (
                     'name' => 'reStructuredText',
                     'ref'  => '../tests/outputs/reStructuredText.rst.yaml',
                     'args' => '../tests/inputs/reStructuredText.rst',
+                },
+                {
+                    'name' => 'Rhai',
+                    'ref'  => '../tests/outputs/comments.rhai.yaml',
+                    'args' => '../tests/inputs/comments.rhai',
                 },
                 {
                     'name' => 'RobotFramework',
@@ -997,19 +1268,34 @@ my @Tests = (
                     'args' => '../tests/inputs/messages.rb',
                 },
                 {
-                    'name' => 'SCSS',
-                    'ref'  => '../tests/outputs/style.scss.yaml',
-                    'args' => '../tests/inputs/style.scss',
-                },
-                {
                     'name' => 'SaltStack',
                     'ref'  => '../tests/outputs/certificates.sls.yaml',
                     'args' => '../tests/inputs/certificates.sls',
                 },
                 {
+                    'name' => 'SCSS',
+                    'ref'  => '../tests/outputs/style.scss.yaml',
+                    'args' => '../tests/inputs/style.scss',
+                },
+                {
                     'name' => 'Scheme',
                     'ref'  => '../tests/outputs/scheme.sls.yaml',
                     'args' => '../tests/inputs/scheme.sls',
+                },
+                {
+                    'name' => 'Sema',
+                    'ref'  => '../tests/outputs/sample.sema.yaml',
+                    'args' => '../tests/inputs/sample.sema',
+                },
+                {
+                    'name' => 'SKILL',
+                    'ref'  => '../tests/outputs/ChangeProperties.il.yaml',
+                    'args' => '../tests/inputs/ChangeProperties.il',
+                },
+                {
+                    'name' => 'Slang',
+                    'ref'  => '../tests/outputs/hello-world.slang.yaml',
+                    'args' => '../tests/inputs/hello-world.slang',
                 },
                 {
                     'name' => 'Starlark',
@@ -1052,6 +1338,11 @@ my @Tests = (
                     'args' => '../tests/inputs/hello.sp',
                 },
                 {
+                    'name' => 'SQL Stored Procedure',
+                    'ref'  => '../tests/outputs/sample.scp.yaml',
+                    'args' => '../tests/inputs/sample.scp',
+                },
+                {
                     'name' => 'Solidity',
                     'ref'  => '../tests/outputs/solidity.sol.yaml',
                     'args' => '../tests/inputs/solidity.sol',
@@ -1082,9 +1373,24 @@ my @Tests = (
                     'args' => '../tests/inputs/rules.sss',
                 },
                 {
-                    'name' => 'Svelte',
+                    'name' => 'SurrealQL',
+                    'ref'  => '../tests/outputs/ranges.surql.yaml',
+                    'args' => '../tests/inputs/ranges.surql',
+                },
+                {
+                    'name' => 'Svelte (HTML comments)',
                     'ref'  => '../tests/outputs/reactive.svelte.yaml',
                     'args' => '../tests/inputs/reactive.svelte',
+                },
+                {
+                    'name' => 'Svelte (C++ comments)',
+                    'ref'  => '../tests/outputs/test_w_cpp_comments.svelte.yaml',
+                    'args' => '../tests/inputs/test_w_cpp_comments.svelte',
+                },
+                {
+                    'name' => 'Svelte (comments in strings)',
+                    'ref'  => '../tests/outputs/comments_in_str.svelte.yaml',
+                    'args' => '--strip-str-comments ../tests/inputs/comments_in_str.svelte',
                 },
                 {
                     'name' => 'SVG',
@@ -1115,6 +1421,11 @@ my @Tests = (
                     'name' => 'TEAL',
                     'ref'  => '../tests/outputs/htlc.teal.yaml',
                     'args' => '../tests/inputs/htlc.teal',
+                },
+                {
+                    'name' => 'Templ',
+                    'ref'  => '../tests/outputs/templ_example.templ.yaml',
+                    'args' => '../tests/inputs/templ_example.templ'
                 },
                 {
                     'name' => 'TeX',
@@ -1152,9 +1463,19 @@ my @Tests = (
                     'args' => '../tests/inputs/toml_example.toml',
                 },
                 {
-                    'name' => 'TNSDL',
+                    'name' => 'TNSDL 1',
                     'ref'  => '../tests/outputs/tnsdl.sdl.yaml',
                     'args' => '../tests/inputs/tnsdl.sdl',
+                },
+                {
+                    'name' => 'TNSDL 2',
+                    'ref'  => '../tests/outputs/TNSDL_1.inf.yaml',
+                    'args' => '../tests/inputs/TNSDL_1.inf',
+                },
+                {
+                    'name' => 'TNSDL 3',
+                    'ref'  => '../tests/outputs/TNSDL_2.inf.yaml',
+                    'args' => '../tests/inputs/TNSDL_2.inf',
                 },
                 {
                     'name' => 'tspeg 1',
@@ -1196,20 +1517,46 @@ my @Tests = (
                     'ref'  => '../tests/outputs/notes.typ.yaml',
                     'args' => '../tests/inputs/notes.typ',
                 },
+
                 {
                     'name' => 'Umka',
                     'ref'  => '../tests/outputs/fractal.um.yaml',
                     'args' => '../tests/inputs/fractal.um',
                 },
+
+                {
+                    'name' => 'Unknown',
+                    # No result will be produced, result.yaml will stay like the previous test
+                    'ref'  => '../tests/outputs/fractal.um.yaml',
+                    'args' => '../tests/inputs/xattr.conf',
+                },
+
+                {
+                    'name' => 'USS',
+                    'ref'  => '../tests/outputs/USS.uss.yaml',
+                    'args' => '../tests/inputs/USS.uss',
+                },
+
+                {
+                    'name' => 'UXML',
+                    'ref'  => '../tests/outputs/UXML.uxml.yaml',
+                    'args' => '../tests/inputs/UXML.uxml',
+                },
+
                 {
                     'name' => 'Vala',
                     'ref'  => '../tests/outputs/gnureadline.vala.yaml',
                     'args' => '../tests/inputs/gnureadline.vala',
                 },
                 {
-                    'name' => 'VB.Net',
-                    'ref'  => '../tests/outputs/VisualBasic.Net.vba.yaml',
-                    'args' => '../tests/inputs/VisualBasic.Net.vba',
+                    'name' => 'VBA',
+                    'ref'  => '../tests/outputs/vba_test.vba.yaml',
+                    'args' => '../tests/inputs/vba_test.vba',
+                },
+                {
+                    'name' => 'VB.NET',
+                    'ref'  => '../tests/outputs/vbnet_test.vb.yaml',
+                    'args' => '../tests/inputs/vbnet_test.vb',
                 },
                 {
                     'name' => 'Velocity Template Language',
@@ -1227,15 +1574,44 @@ my @Tests = (
                     'args' => '../tests/inputs/JetCar.cls',
                 },
                 {
+                    'name' => 'Visual Basic (Dsr)',
+                    'ref'  => '../tests/outputs/test.Dsr.yaml',
+                    'args' => '../tests/inputs/test.Dsr',
+                },
+                {
+                    'name' => 'Visual Basic .NET (vbhtml)',
+                    'ref'  => '../tests/outputs/test.vbhtml.yaml',
+                    'args' => '../tests/inputs/test.vbhtml',
+                },
+                {
+                    'name' => 'VBScript',
+                    'ref'  => '../tests/outputs/test.vbs.yaml',
+                    'args' => '../tests/inputs/test.vbs',
+                },
+                {
                     'name' => 'Visual Studio Solution',
                     'ref'  => '../tests/outputs/vs_solution.sln.yaml',
                     'args' => '../tests/inputs/vs_solution.sln',
                 },
+
                 {
-                    'name' => 'Vuejs Component',
+                    'name' => 'Vuejs Component 1',
                     'ref'  => '../tests/outputs/ItemView.vue.yaml',
                     'args' => '../tests/inputs/ItemView.vue',
                 },
+
+                {
+                    'name' => 'VSCode Workspace',
+                    'ref'  => '../tests/outputs/cloc-dev.code-workspace.yaml',
+                    'args' => '../tests/inputs/cloc-dev.code-workspace',
+                },
+
+                {
+                    'name' => 'Vuejs Component 2',
+                    'ref'  => '../tests/outputs/issue_876.vue.yaml',
+                    'args' => '../tests/inputs/issue_876.vue',
+                },
+
                 {
                     'name' => 'Vyper',
                     'ref'  => '../tests/outputs/vyper.vy.yaml',
@@ -1250,6 +1626,16 @@ my @Tests = (
                     'name' => 'Web Services Description',
                     'ref'  => '../tests/outputs/webservice.wsdl.yaml',
                     'args' => '../tests/inputs/webservice.wsdl',
+                },
+                {
+                    'name' => 'Windows INF 1',
+                    'ref'  => '../tests/outputs/setup_info_1.inf.yaml',
+                    'args' => '../tests/inputs/setup_info_1.inf',
+                },
+                {
+                    'name' => 'Windows INF 2',
+                    'ref'  => '../tests/outputs/setup_info_2.inf.yaml',
+                    'args' => '../tests/inputs/setup_info_2.inf',
                 },
                 {
                     'name' => 'WGSL',
@@ -1277,6 +1663,11 @@ my @Tests = (
                     'args' => '../tests/inputs/ZosNet.rc',
                 },
                 {
+                    'name' => 'Wren',
+                    'ref'  => '../tests/outputs/mandelbrot.wren.yaml',
+                    'args' => '../tests/inputs/mandelbrot.wren',
+                },
+                {
                     'name' => 'WXML',
                     'ref'  => '../tests/outputs/pages.wxml.yaml',
                     'args' => '../tests/inputs/pages.wxml',
@@ -1302,6 +1693,11 @@ my @Tests = (
                     'args' => '../tests/inputs/XML.xml',
                 },
                 {
+                    'name' => 'XML (Qt/GTK)',
+                    'ref'  => '../tests/outputs/BoxWidget.ui.yaml',
+                    'args' => '../tests/inputs/BoxWidget.ui',
+                },
+                {
                     'name' => 'XQuery',
                     'ref'  => '../tests/outputs/pop_by_country.xq.yaml',
                     'args' => '../tests/inputs/pop_by_country.xq',
@@ -1322,6 +1718,16 @@ my @Tests = (
                     'args' => '../tests/inputs/Xtend.xtend',
                 },
                 {
+                    'name' => 'Yang',
+                    'ref'  => '../tests/outputs/bbf-device.yang.yaml',
+                    'args' => '../tests/inputs/bbf-device.yang',
+                },
+                {
+                    'name' => 'Yarn',
+                    'ref'  => '../tests/outputs/guard_talking.yarn.yaml',
+                    'args' => '../tests/inputs/guard_talking.yarn',
+                },
+                {
                     'name' => 'Zig',
                     'ref'  => '../tests/outputs/zir_sema.zig.yaml',
                     'args' => '../tests/inputs/zir_sema.zig',
@@ -1332,8 +1738,8 @@ my $Verbose = 0;
 
 my $results  = 'results.yaml';
 my $work_dir = getcwd;
-my $cloc     = "$work_dir/../cloc";   # all-purpose version
-#my $cloc     = "$work_dir/cloc";      # Unix-tuned version
+my $cloc     = "$work_dir/../cloc";                 # all-purpose version
+   $cloc     = "$work_dir/cloc" if defined $opt{u}; # Unix-tuned version
 my $Run = "$cloc --quiet --yaml --out $results ";
 foreach my $t (@Tests) {
     print  $Run . $t->{'args'} if $Verbose;
@@ -1344,6 +1750,7 @@ foreach my $t (@Tests) {
     is_deeply(\%this, \%ref, $t->{'name'} . " results match");
 }
 done_testing();
+print "Finished testing $cloc\n";
 
 sub load_yaml { # {{{1
     my ($file, ) = @_;
