@@ -1195,9 +1195,9 @@ if ($opt_extract_with or
             $bin_file_full_path = File::Spec->catfile( $cwd, $bin_file );
 #print "bin_file_full_path (was rel) = [$bin_file_full_path]\n";
         }
-        my     $extract_cmd = uncompress_archive_cmd($bin_file_full_path);
-        print  $extract_cmd, "\n" if $opt_v;
-        system $extract_cmd;
+        my @extract_cmd = uncompress_archive_cmd($bin_file_full_path);
+        print "@extract_cmd\n" if $opt_v;
+        system @extract_cmd;
         push @extract_location, $extract_dir;
         chdir $cwd;
     }
@@ -1229,9 +1229,9 @@ if ($opt_extract_with or
             print "cd    $extract_dir\n"  if $opt_v;
             chdir  $extract_dir;
 
-            my     $extract_cmd = uncompress_archive_cmd($archive);
-            print  $extract_cmd, "\n" if $opt_v;
-            system $extract_cmd;
+            my @extract_cmd = uncompress_archive_cmd($archive);
+            print "@extract_cmd\n" if $opt_v;
+            system @extract_cmd;
             push @extract_location, $extract_dir;
             unlink $archive;  # otherwise will be extracting it forever
         }
@@ -1260,8 +1260,8 @@ if ($opt_extract_with or
             $full_path = File::Spec->catfile( $cwd, $Arg );
         }
 #print "full_path = [$full_path]\n";
-        my $extract_cmd = uncompress_archive_cmd($full_path);
-        if ($extract_cmd) {
+        my @extract_cmd = uncompress_archive_cmd($full_path);
+        if (@extract_cmd) {
             my $extract_dir = undef;
             if ($opt_sdir) {
                 ++$TEMP_OFF;
@@ -1275,8 +1275,8 @@ if ($opt_extract_with or
             print "mkdir $extract_dir\n"  if $opt_v;
             print "cd    $extract_dir\n"  if $opt_v;
             chdir  $extract_dir;
-            print  $extract_cmd, "\n" if $opt_v;
-            system $extract_cmd;
+            print "@extract_cmd\n" if $opt_v;
+            system @extract_cmd;
             push @updated_ARGS, $extract_dir;
             chdir $cwd;
         } else {
@@ -14874,22 +14874,25 @@ sub uncompress_archive_cmd {                 # {{{1
     # spaces in the names).
 
     print "-> uncompress_archive_cmd($archive_file)\n" if $opt_v > 2;
-    my $extract_cmd = "";
-    my $missing     = "";
+    my @extract_cmd = ();
+    my $missing      = "";
     if ($opt_extract_with) {
-        ( $extract_cmd = $opt_extract_with ) =~ s/>FILE</$archive_file/g;
+        my $user_cmd = $opt_extract_with;
+        $user_cmd =~ s/>FILE</$archive_file/g;
+        @extract_cmd  = ( split(/\s+/, $user_cmd) );
+##      ( $extract_cmd = $opt_extract_with ) =~ s/>FILE</$archive_file/g;
     } elsif (basename($archive_file) eq "-" and !$ON_WINDOWS) {
-        $extract_cmd = "cat > -";
+        @extract_cmd  = ("cat", ">", "-");
     } elsif ($archive_file =~ /\.tar$/ and $ON_WINDOWS) {
-        $extract_cmd = "tar -xf \"$archive_file\"";
+        @extract_cmd  = ("tar", "-xf", "\"$archive_file\"");
     } elsif ($archive_file =~ /\.tar(\.(gz|Z|xz|bz2))?$/
             or $archive_file =~ /\.(tgz|gem)$/
             and !$ON_WINDOWS)    {
-        $extract_cmd = "tar xf '$archive_file'";
+        @extract_cmd  = ("tar", "xf", "$archive_file");
     } elsif ($archive_file =~ /\.src\.rpm$/i and !$ON_WINDOWS) {
         if (external_utility_exists("cpio --version")) {
             if (external_utility_exists("rpm2cpio")) {
-                $extract_cmd = "rpm2cpio '$archive_file' | cpio -i";
+                @extract_cmd  = ("rpm2cpio", "$archive_file", "|", "cpio", "-i");
             } else {
                 $missing = "rpm2cpio";
             }
@@ -14898,7 +14901,7 @@ sub uncompress_archive_cmd {                 # {{{1
         }
     } elsif ($archive_file =~ /\.(whl|zip)$/i and !$ON_WINDOWS)    {
         if (external_utility_exists("unzip")) {
-            $extract_cmd = "unzip -qq -d . '$archive_file'";
+            @extract_cmd  = ("unzip", "-qq", "-d", ".", "$archive_file");
         } else {
             $missing = "unzip";
         }
@@ -14906,25 +14909,25 @@ sub uncompress_archive_cmd {                 # {{{1
         # only useful if the .deb contains source code--most
         # .deb files just have compiled executables
         if (external_utility_exists("dpkg-deb")) {
-            $extract_cmd = "dpkg-deb -x '$archive_file' .";
+            @extract_cmd  = ("dpkg-deb", "-x", "$archive_file", ".");
         } else {
             $missing = "dpkg-deb";
         }
     } elsif ($ON_WINDOWS and $archive_file =~ /\.(whl|zip)$/i) {
         # use unzip on Windows (comes with git-for-Windows)
         if (external_utility_exists("unzip")) {
-             $extract_cmd = "unzip -qq -d . \"$archive_file\" ";
+            @extract_cmd  = ("unzip", "-qq", "-d", ".", "\"$archive_file\"");
         } else {
             $missing = "unzip";
         }
     }
-    print "<- uncompress_archive_cmd ($extract_cmd)\n" if $opt_v > 2;
+    print "<- uncompress_archive_cmd (@extract_cmd)\n" if $opt_v > 2;
     if ($missing) {
         die "Unable to expand $archive_file because external\n",
             "utility '$missing' is not available.\n",
             "Another possibility is to use the --extract-with option.\n";
     } else {
-        return $extract_cmd;
+        return @extract_cmd;
     }
 }
 # 1}}}
