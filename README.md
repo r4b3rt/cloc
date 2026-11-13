@@ -4,9 +4,9 @@
 * * *
 cloc counts blank lines, comment lines, and physical lines of source code in many programming languages.
 
-Latest release:  v2.10 (July 4, 2026)
+Latest release:  v2.12 (Nov. 12, 2026)
 
-[![Version](https://img.shields.io/badge/version-2.10-blue.svg)](https://github.com/AlDanial/cloc)
+[![Version](https://img.shields.io/badge/version-2.12-blue.svg)](https://github.com/AlDanial/cloc)
 [![Contributors](https://img.shields.io/github/contributors/AlDanial/cloc.svg)](https://github.com/AlDanial/cloc/graphs/contributors)
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5760076.svg)](https://doi.org/10.5281/zenodo.5760076)
 [![Forks](https://img.shields.io/github/forks/AlDanial/cloc.svg)](https://github.com/AlDanial/cloc/network/members)
@@ -31,8 +31,8 @@ Step 3:  Invoke cloc to count your source files, directories, archives,
 or git commits.
 The executable name differs depending on whether you use the
 development source version (`cloc`), source for a
-released version (`cloc-2.10.pl`) or a Windows executable
-(`cloc-2.10.exe`).
+released version (`cloc-2.12.pl`) or a Windows executable
+(`cloc-2.12.exe`).
 
 On this page, `cloc` is the generic term
 used to refer to any of these.
@@ -231,13 +231,13 @@ Grab the latest release of cloc from the [Releases section of this repository](h
 
 ### Source version on Linux/macOS
 
-Save the latest source file, for example `cloc-2.10.pl`,
+Save the latest source file, for example `cloc-2.12.pl`,
 as `cloc` (if you prefer the shorter command name) somewhere on your `PATH`.
 After downloading, make the file executable:
 
 ```shell
 cd ~/Downloads
-mv cloc-2.10.pl cloc
+mv cloc-2.12.pl cloc
 chmod a+rx cloc
 ./cloc --version     # make sure it runs
 mv cloc ~/bin        # for example, if ~/bin is in $PATH
@@ -252,12 +252,12 @@ navigate to the download directory (`C:\TEMP` in the example below), then test c
 
 ```dos
 cd C:\TEMP>
-C:TEMP\> perl cloc-2.10.pl --version
+C:TEMP\> perl cloc-2.12.pl --version
 ```
 
 ### Binary version on Windows
 
-Download the latest released Windows executable, for example `cloc-2.10.exe`
+Download the latest released Windows executable, for example `cloc-2.12.exe`
 and save it as `cloc.exe` (if desired) in a directory on your `PATH`.
 
 There is no binary version for Linux or macOS.
@@ -413,14 +413,14 @@ C:> cpan -i Regexp::Common
 C:> cpan -i Algorithm::Diff
 C:> cpan -i PAR::Packer
 C:> cpan -i Win32::LongPath
-C:> pp -M Win32::LongPath -M Encode::Unicode -M Digest::MD5 -c -x -o cloc-2.10.exe cloc-2.10.pl
+C:> pp -M Win32::LongPath -M Encode::Unicode -M Digest::MD5 -c -x -o cloc-2.12.exe cloc-2.12.pl
 ```
 
 A variation on the instructions above is if you installed the portable
 version of Strawberry Perl, you will need to run `portableshell.bat` first
 to properly set up your environment.
 
-The Windows executable in the Releases section, `cloc-2.10.exe`,
+The Windows executable in the Releases section, `cloc-2.12.exe`,
 was built on a 64 bit Windows 11 computer using
 [Strawberry Perl](http://strawberryperl.com/)
 5.32.1 and
@@ -441,6 +441,9 @@ You are encouraged to run your own virus scanners against the
 executable and also check sites such
 https://www.virustotal.com/ .
 The entries for recent versions are:
+
+cloc-2.12.exe:
+https://www.virustotal.com/gui/file/b800034063ae3e3733ce34579d5d74cacd4dc4b842534d3f4b910d5a03ef63b1?nocache=1
 
 cloc-2.10.exe:
 https://www.virustotal.com/gui/file/97786c4b5bb71d2be67e42061a2f5d03db73bbf88228f8710001d770e867bbef/detection
@@ -3168,11 +3171,11 @@ Please use the following bibtex entry to cite cloc in a publication:
 ```
 @software{adanial_cloc,
   author       = {Albert Danial},
-  title        = {cloc: v2.10},
-  month        = jan,
+  title        = {cloc: v2.12},
+  month        = nov,
   year         = 2026,
   publisher    = {Zenodo},
-  version      = {v2.10},
+  version      = {v2.12},
   doi          = {10.5281/zenodo.18364352},
   url          = {https://doi.org/10.5281/zenodo.18364352}
 }
