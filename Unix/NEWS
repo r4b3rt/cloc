@@ -1,3 +1,39 @@
+                Release Notes for cloc version 2.12
+                   https://github.com/AlDanial/cloc
+                             Nov. 12, 2026
+
+     * This is a security release to address vulnerabilities in the handling of *
+     * archive files (zip, tar, rpm, whl, gem, etc).  A maliciously crafted     *
+     * archive file counted with cloc versions before this release can allow a  *
+     * remote code execution (RCE) attack.                                      *
+
+New Languages and File Types:
+    o AL (Business Central)
+    o CUE
+    o KDL
+    o RON
+    o Salam
+    o Sema
+    o Windows INF
+    o Wren
+
+Updates:
+    o Add ability to count contents of .gem files.
+    o New switch --total to show total column counts
+    o Make --exclude-lang case insensitive to make it consistent with --include-lang
+    o Recognize comment markers in single quoted QML strings
+    o Add .scp as an extension for SQL stored procedures
+    o Add .inc as an extension for Assembly
+
+Bug fixes:
+    o Secure handling of system calls to expand archive files.
+    o Prevent regex timeouts in Swift.
+    o Lower memory requirements when handling large XML/THML and binary files.
+    o Fix double-open on Windows when handling long paths.
+    o Ensure an archive file is not a directory before attempting to extract it.
+
+============================================================================
+                Release Notes for cloc version 2.10
                    https://github.com/AlDanial/cloc
                              July 4, 2026
 

@@ -829,7 +829,7 @@ below N where X is one of
 Appending a percent sign to N changes
 the calculation from straight count to
 percentage.
-Ignored with --diff or --by-file.
+Ignored with B<--diff> or B<--by-file>.
 
 =item B<--sql=FILE>
 
@@ -856,6 +856,23 @@ SQLite format.  Styles include B<Oracle> and B<Named_Columns>.
 
 For plain text reports, show the SUM: output line even if only
 one input file is processed.
+
+==item B<--thousands-delimiter=C>
+
+Divides numbers with many digits (i.e. numbers
+over 999) into groups using the character <C> as
+delimiter (e.g. for <C> = '.': 12345 -> 12.345).
+Only works with the '--fmt' option.
+Sample values: '.', ',', '_', ' '
+Synonym:  B<--ksep>
+
+==item B<--total>
+
+Add a 'Total' column to the report equal to
+the sum of blank, comment, and code lines for
+each language (or file).  Applies to the text,
+Markdown, CSV, XML, YAML, and JSON reports.
+Ignored with B<--diff> or B<--sql>.
 
 =item B<--xml>
 
